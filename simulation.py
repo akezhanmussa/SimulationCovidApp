@@ -1,10 +1,47 @@
 import requests
 import random
+import typing
+import json
+import logging
+
+back_url = None
+
+def set_api_host(host):
+    global back_url
+
+    if back_url is None:
+        back_url = host
 
 
-BACK_URL = 'https://covid--back.herokuapp.com'
+def fetch_authoriztion_token(
+    basic_auth: typing.Tuple[float, float],
+    oauth: typing.Dict[str, str],
+    endpoint: str,
+    ):
 
-def send_new_cases(lat_range=(51.024901, 51.227157), lon_range=(71.297808, 71.592204), count=10, endpoint='data-api/new-case') -> requests.Response:
+    response = requests.post(
+        f'{back_url}/{endpoint}',
+        data=oauth,
+        auth=basic_auth,
+        headers={'Content-Type': 'application/x-www-form-urlencoded'},
+    )
+
+    if response.status_code != 200:
+        return None, None
+
+    body = response.json()    
+
+    return body['access_token'], body['token_type']
+
+
+def send_new_cases(
+    auth_token: str,
+    token_type: str,
+    lat_range: typing.Tuple[float, float], 
+    lon_range: typing.Tuple[float, float], 
+    count: int, 
+    endpoint: str,
+    ) -> typing.List[requests.Response]:
 
     responses = []
     
@@ -21,17 +58,17 @@ def send_new_cases(lat_range=(51.024901, 51.227157), lon_range=(71.297808, 71.59
         
         if new_lon > lon_range[1] or new_lon < lon_range[0]:
             continue
-        
-        print(f'Generated latitude: {new_lat}, longtitude: {new_lon}')
-        
+
+        print(f'Generated new hotspot with latitude: {new_lat}, longitude: {new_lon}')
+                
         response = requests.api.post(
-            f'{BACK_URL}/{endpoint}',
+            f'{back_url}/{endpoint}',
             json={
                 'latitude': new_lat,
                 'longitude': new_lon,
             },
             headers={
-                'Authorization': 'Bearer IdfxFirDkNcJ19EQPgY8hgZcSgs',
+                'Authorization': f'{token_type} {auth_token}',
             },
         )
         responses.append(response)
