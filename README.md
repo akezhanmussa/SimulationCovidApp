@@ -18,6 +18,6 @@
 
 #### When you will be running simulation, don't forget to use valid server host and oauth credentials in config yaml
 
-#### To start simulation, simply type: 
+#### To start simulation, install all needed requirements and then simply type: 
 
-python main.py
+* python main.py
