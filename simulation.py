@@ -46,8 +46,8 @@ def send_new_cases(
     responses = []
     
     for _ in range(count):
-        lat_offset = random.random() / 10
-        lon_offset = random.random() / 10
+        lat_offset = random.random() / 5
+        lon_offset = random.random() / 5
         
         new_lat = round(lat_range[0], 1) + lat_offset
         
